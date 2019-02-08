@@ -21,6 +21,7 @@ class Pagination {
    * @param {string} params.sort.field The sort field name.
    * @param {string} params.sort.order The sort order. Either 1/-1 or asc/desc.
    * @param {?object} params.projection The field projection (fields to return).
+   * @param {?object} params.populate Fields to be populated.
    * @param {object} options Additional sort, limit and criteria merge options.
    *                         See the corresponding classes.
    */
@@ -29,6 +30,7 @@ class Pagination {
     pagination = {},
     sort = {},
     projection,
+    populate = {},
   } = {}, options = {}) {
     this.promises = {};
 
@@ -53,6 +55,9 @@ class Pagination {
 
     // Set the projection.
     this.projection = projection;
+
+    // Set the population object
+    this.populate = populate;
   }
 
   /**
@@ -78,6 +83,7 @@ class Pagination {
     const run = async () => {
       const criteria = await this.getQueryCriteria();
       const docs = await this.Model.find(criteria, this.projection)
+        .populate(this.populate)
         .sort(this.sort.value)
         .limit(this.first.value)
         .collation(this.sort.collation)
